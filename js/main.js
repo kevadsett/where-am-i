@@ -22,6 +22,24 @@ var main = {
             }, {
                 name: "swamp",
                 colour: 0x005600
+            }, {
+                name: "castle",
+                colour: 0x67646E
+            }, {
+                name: "beacon",
+                colour: 0xFFD324
+            }, {
+                name: "bridge",
+                colour: 0x5E3613
+            }, {
+                name: "cave",
+                colour: 0x595959
+            }, {
+                name: "ship",
+                colour: 0xB58E6D
+            }, {
+                name: "beach",
+                colour: 0xF0D175
             }];
         graphics.beginFill(0);
         graphics.drawRect(0, 550, 800, 100);
