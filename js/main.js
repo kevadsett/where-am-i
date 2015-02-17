@@ -78,7 +78,10 @@ var main = {
             cell.thing = thing;
             thingCells[thing.name] = cell;
         }
-
+        var descriptions = describeCell(correctCell);
+        var text = descriptions[0].description;
+        var style = { font: "12px Arial", fill: "#dddddd", align: "center" };
+        var t = game.add.text(0, 550, text, style);
     },
     update: function() {
 
@@ -91,20 +94,28 @@ function getRandomColour() {
 function getRandomCell() {
     return {row: Math.floor(Math.random() * rows), column: Math.floor(Math.random() * columns)};
 }
-function onCellClicked(cell) {
+function describeCell(cell) {
     // cell.frame = cell.isCorrect ? 2 : 1;
+    var cellDescriptions = [];
     for (var key in thingCells) {
         var thingCell = thingCells[key];
         var colDist = thingCell.column - cell.column;
         var rowDist = thingCell.row - cell.row;
         var description = getNaturalLanguage(colDist, rowDist, key);
         if (description) {
-            console.log(description);
+            cellDescriptions.push(description);
         }
     }
+    cellDescriptions.sort(function(a, b) {
+        return a.distance - b.distance;
+    });
+    return cellDescriptions;
+}
+function onCellClicked(cell) {
+    cell.frame = cell.isCorrect ? 2 : 1;
 }
 function getNaturalLanguage(colDist, rowDist, name) {
-    var direction, distance, language;
+    var direction, description, language;
     if (rowDist < -1) {
         direction = "North";
     } else if (rowDist > 1) {
@@ -115,26 +126,28 @@ function getNaturalLanguage(colDist, rowDist, name) {
     } else if (colDist > 1) {
         direction = direction ? direction + "-east" : "East";
     }
-    var absDist = Math.abs(colDist) + Math.abs(rowDist);
-    switch (absDist) {
+    var distance = Math.abs(colDist) + Math.abs(rowDist);
+    switch (distance) {
         case 0:
+            description = "At a %s";
+            break;
         case 1:
         case 2:
-            distance = "Next to a %s";
+            description = "Next to a %s";
             break;
         case 3:
         case 4:
-            distance = "Quite near a %s";
+            description = "There's a %s quite close to the " + direction;
             break;
         case 5:
         case 6:
-            distance = "There's a %s in the distance.";
+            description = "There's a %s in the distance to the " + direction;
             break;
     }
-    if (distance) {
-        distance = distance.replace("%s", name);
+    if (description) {
+        description = description.replace("%s", name);
     }
-    return distance;
+    return {description: description, distance: distance};
 }
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv');
