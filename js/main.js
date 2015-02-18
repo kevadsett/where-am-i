@@ -4,9 +4,12 @@ var cells;
 var cellSize = 64;
 var thingCells = {};
 var correctCell;
+var button;
+var clueText;
 var main = {
     preload: function() {
         game.load.spritesheet('cell', 'cellSprite.png', cellSize, cellSize);
+        game.load.image('button', 'button.png');
     },
     create: function() {
         game.stage.backgroundColor = 0xffffff;
@@ -54,15 +57,13 @@ var main = {
                 cell = game.add.sprite(x, y, 'cell');
                 cell.inputEnabled = true;
                 cell.events.onInputDown.add(onCellClicked, this);
-                cell.isCorrect = (row === correctCellCoords.row && col === correctCellCoords.column);
-                if (cell.isCorrect) {
-                    correctCell = cell;
-                }
+                cell.isCorrect = false;
                 cell.row = row;
                 cell.column = col;
                 cells[row][col] = cell;
             }
         }
+
         while (things.length > 0) {
             var coords = getRandomCell();
             cell = cells[coords.row][coords.column];
@@ -78,15 +79,30 @@ var main = {
             cell.thing = thing;
             thingCells[thing.name] = cell;
         }
-        var descriptions = describeCell(correctCell);
-        var text = descriptions[0].description;
+        while(cells[correctCellCoords.row][correctCellCoords.column].thing) {
+            correctCellCoords = getRandomCell();
+        }
+        correctCell = cells[correctCellCoords.row][correctCellCoords.column];
+        correctCell.isCorrect = true;
+        correctCell.descriptions = describeCell(correctCell);
+        var text = correctCell.descriptions[0].description;
         var style = { font: "12px Arial", fill: "#dddddd", align: "center" };
-        var t = game.add.text(0, 550, text, style);
+        clueText = game.add.text(0, 550, text, style);
+
+        button = game.add.button(game.world.width - 150, game.world.height - 50, 'button', onButtonPressed);
     },
     update: function() {
 
     }
 };
+
+function onButtonPressed() {
+    var descriptionCount = correctCell.descriptions.length;
+    console.log(descriptionCount);
+    var index = Math.floor(Math.random() * descriptionCount);
+    console.log(index);
+    clueText.text = correctCell.descriptions[index].description;
+}
 
 function getRandomColour() {
     return parseInt(Math.floor(Math.random() * (16777215)).toString(16), 16);
@@ -102,7 +118,7 @@ function describeCell(cell) {
         var colDist = thingCell.column - cell.column;
         var rowDist = thingCell.row - cell.row;
         var description = getNaturalLanguage(colDist, rowDist, key);
-        if (description) {
+        if (description.description) {
             cellDescriptions.push(description);
         }
     }
