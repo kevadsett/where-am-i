@@ -78,6 +78,7 @@ var main = {
             graphics.drawRect(x, y, cellSize,cellSize);
             cell.thing = thing;
             thingCells[thing.name] = cell;
+            cellText = game.add.text(x, y, thing.name, {font: "12px Arial", fill:"#000000"});
         }
         while(cells[correctCellCoords.row][correctCellCoords.column].thing) {
             correctCellCoords = getRandomCell();
@@ -85,7 +86,8 @@ var main = {
         correctCell = cells[correctCellCoords.row][correctCellCoords.column];
         correctCell.isCorrect = true;
         correctCell.descriptions = describeCell(correctCell);
-        var text = correctCell.descriptions[0].description;
+        correctCell.descriptionIndex = correctCell.descriptions.length - 1;
+        var text = correctCell.descriptions[correctCell.descriptionIndex].description;
         var style = { font: "12px Arial", fill: "#dddddd", align: "center" };
         clueText = game.add.text(0, 550, text, style);
 
@@ -97,11 +99,12 @@ var main = {
 };
 
 function onButtonPressed() {
-    var descriptionCount = correctCell.descriptions.length;
-    console.log(descriptionCount);
-    var index = Math.floor(Math.random() * descriptionCount);
-    console.log(index);
-    clueText.text = correctCell.descriptions[index].description;
+    var currentDescriptionIndex = correctCell.descriptionIndex - 1;
+    if (currentDescriptionIndex < 0) {
+        currentDescriptionIndex = correctCell.descriptions.length - 1;
+    }
+    correctCell.descriptionIndex = currentDescriptionIndex;
+    clueText.text = correctCell.descriptions[currentDescriptionIndex].description;
 }
 
 function getRandomColour() {
@@ -142,18 +145,23 @@ function getNaturalLanguage(colDist, rowDist, name) {
     } else if (colDist > 1) {
         direction = direction ? direction + "-east" : "East";
     }
-    var distance = Math.abs(colDist) + Math.abs(rowDist);
+    console.log(name, colDist, rowDist);
+    var distance = Math.max(Math.abs(colDist), Math.abs(rowDist));
     switch (distance) {
         case 0:
             description = "At a %s";
             break;
         case 1:
+            description = "I'm next to a %s";
+            break;
         case 2:
-            description = "Next to a %s";
+            description = "I'm pretty near to a %s";
             break;
         case 3:
+            description = "I can see a %s close to the " + direction;
+            break;
         case 4:
-            description = "There's a %s quite close to the " + direction;
+            description = "There's a %s to the " + direction;
             break;
         case 5:
         case 6:
