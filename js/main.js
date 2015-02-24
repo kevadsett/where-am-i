@@ -9,54 +9,56 @@ var clueText;
 var main = {
     preload: function() {
         game.load.spritesheet('cell', 'cellSprite.png', cellSize, cellSize);
-        game.load.image('button', 'button.png');
+        game.load.spritesheet('things', 'thingSprite.png', cellSize, cellSize);
+        game.load.spritesheet('answer', 'rightWrongSprite.png', cellSize, cellSize);
+        game.load.spritesheet('button', 'button.png', 150, 50);
     },
     create: function() {
-        game.stage.backgroundColor = 0xffffff;
+        game.stage.backgroundColor = 0xd2ba72;
         var graphics = game.add.graphics(0, 0),
             i, row, col, x, y, cell,
             correctCellCoords = getRandomCell(),
             things = [{
                 name: "mountain",
-                colour:0xcccccc
+                frame: 0
             }, {
                 name: "forest",
-                colour: 0x12cc32
+                frame: 1
             }, {
                 name: "swamp",
-                colour: 0x005600
+                frame: 2
             }, {
-                name: "castle",
-                colour: 0x67646E
+                name: "field",
+                frame: 3
             }, {
                 name: "beacon",
-                colour: 0xFFD324
+                frame: 4
             }, {
                 name: "bridge",
-                colour: 0x5E3613
+                frame: 5
             }, {
                 name: "cave",
-                colour: 0x595959
-            }, {
+                frame: 6
+            }/*, {
                 name: "ship",
                 colour: 0xB58E6D
             }, {
                 name: "beach",
                 colour: 0xF0D175
-            }];
+            }*/];
         graphics.beginFill(0);
-        graphics.drawRect(0, 550, 800, 100);
+        graphics.drawRect(0, game.world.height - 50, game.world.width, 50);
         cells = new Array(rows);
         for (i = 0; i < cells.length; i++) {
             cells[i] = new Array(columns);
         }
         for (row = 0; row < rows; row++) {
             for (col = 0; col < columns; col++) {
-                x = cellSize * col;
-                y = cellSize * row;
-                cell = game.add.sprite(x, y, 'cell');
-                cell.inputEnabled = true;
+                var x = cellSize * col,
+                    y = cellSize * row;
+                cell = game.add.sprite(x, y, 'things', 12);
                 cell.events.onInputDown.add(onCellClicked, this);
+                cell.inputEnabled = true;
                 cell.isCorrect = false;
                 cell.row = row;
                 cell.column = col;
@@ -72,13 +74,15 @@ var main = {
                 cell = cells[coords.row][coords.column];
             }
             var thing = things.splice(Math.floor(Math.random() * things.length), 1)[0];
+            cell.frame = thing.frame;
+           /* var thing = things.splice(Math.floor(Math.random() * things.length), 1)[0];
             graphics.beginFill(thing.colour);
             x = cellSize * coords.column;
             y = cellSize * coords.row;
             graphics.drawRect(x, y, cellSize,cellSize);
-            cell.thing = thing;
+            cell.thing = thing;*/
             thingCells[thing.name] = cell;
-            cellText = game.add.text(x, y, thing.name, {font: "12px Arial", fill:"#000000"});
+            // cellText = game.add.text(cell.x, cell.y, thing.name, {font: "12px Arial", fill:"#000000"});
         }
         while(cells[correctCellCoords.row][correctCellCoords.column].thing) {
             correctCellCoords = getRandomCell();
@@ -89,9 +93,9 @@ var main = {
         correctCell.descriptionIndex = correctCell.descriptions.length - 1;
         var text = correctCell.descriptions[correctCell.descriptionIndex].description;
         var style = { font: "12px Arial", fill: "#dddddd", align: "center" };
-        clueText = game.add.text(0, 550, text, style);
+        clueText = game.add.text(0, game.world.height - 50, text, style);
 
-        button = game.add.button(game.world.width - 150, game.world.height - 50, 'button', onButtonPressed);
+        button = game.add.button(game.world.width - 150, game.world.height - 50, 'button', onButtonPressed, this, 0, 0, 1, 0);
     },
     update: function() {
 
@@ -131,7 +135,12 @@ function describeCell(cell) {
     return cellDescriptions;
 }
 function onCellClicked(cell) {
-    cell.frame = cell.isCorrect ? 2 : 1;
+    game.add.sprite(cell.x, cell.y, 'answer', cell.isCorrect ? 0 : 1);
+    if (cell.isCorrect) {
+        clueText.text = "You found me!";
+    } else {
+        clueText.text = "No that's not it";
+    }
 }
 function getNaturalLanguage(colDist, rowDist, name) {
     var direction, description, language;
@@ -149,7 +158,7 @@ function getNaturalLanguage(colDist, rowDist, name) {
     var distance = Math.max(Math.abs(colDist), Math.abs(rowDist));
     switch (distance) {
         case 0:
-            description = "At a %s";
+            description = "I'm at a %s";
             break;
         case 1:
             description = "I'm next to a %s";
@@ -174,6 +183,6 @@ function getNaturalLanguage(colDist, rowDist, name) {
     return {description: description, distance: distance};
 }
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(cellSize * columns, cellSize * rows + 50, Phaser.AUTO, 'gameDiv');
 game.state.add('main', main);
 game.state.start('main');
