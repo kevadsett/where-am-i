@@ -6,6 +6,8 @@ var thingCells = {};
 var correctCell;
 var button;
 var clueText;
+var clueDiv;
+var turnsUntilLost;
 var main = {
     preload: function() {
         game.load.spritesheet('cell', 'cellSprite.png', cellSize, cellSize);
@@ -14,7 +16,9 @@ var main = {
         game.load.spritesheet('button', 'button.png', 150, 50);
     },
     create: function() {
-        game.stage.backgroundColor = 0xd2ba72;
+        clueList = document.getElementById('clueList');
+        turnsText = document.getElementById('turnsUntilLost');
+        game.stage.backgroundColor = 0xffffff;
         var graphics = game.add.graphics(0, 0),
             i, row, col, x, y, cell,
             correctCellCoords = getRandomCell(),
@@ -46,8 +50,6 @@ var main = {
                 name: "beach",
                 colour: 0xF0D175
             }*/];
-        graphics.beginFill(0);
-        graphics.drawRect(0, game.world.height - 50, game.world.width, 50);
         cells = new Array(rows);
         for (i = 0; i < cells.length; i++) {
             cells[i] = new Array(columns);
@@ -93,9 +95,12 @@ var main = {
         correctCell.descriptionIndex = correctCell.descriptions.length - 1;
         var text = correctCell.descriptions[correctCell.descriptionIndex].description;
         var style = { font: "12px Arial", fill: "#dddddd", align: "center" };
-        clueText = game.add.text(0, game.world.height - 50, text, style);
+        // clueText = game.add.text(0, game.world.height - 50, text, style);
+        clueList.innerHTML = "<li>" + text + "</li>";
 
-        button = game.add.button(game.world.width - 150, game.world.height - 50, 'button', onButtonPressed, this, 0, 0, 1, 0);
+        button = game.add.button((game.world.width - 150) / 2, game.world.height - 50, 'button', onButtonPressed, this, 0, 0, 1, 0);
+
+        turnsText.innerHTML = turnsUntilLost;
     },
     update: function() {
 
@@ -108,7 +113,11 @@ function onButtonPressed() {
         currentDescriptionIndex = correctCell.descriptions.length - 1;
     }
     correctCell.descriptionIndex = currentDescriptionIndex;
-    clueText.text = correctCell.descriptions[currentDescriptionIndex].description;
+    clueList.innerHTML += "<li>" + correctCell.descriptions[currentDescriptionIndex].description + "</li>";
+    turnsText.innerHTML = --turnsUntilLost;
+    if (turnsUntilLost <= 2) {
+        button.visible = false;
+    }
 }
 
 function getRandomColour() {
@@ -132,14 +141,23 @@ function describeCell(cell) {
     cellDescriptions.sort(function(a, b) {
         return a.distance - b.distance;
     });
+    turnsUntilLost = cellDescriptions.length + 1;
     return cellDescriptions;
 }
 function onCellClicked(cell) {
+    if (turnsUntilLost <= 0) return;
     game.add.sprite(cell.x, cell.y, 'answer', cell.isCorrect ? 0 : 1);
+    turnsUntilLost--;
     if (cell.isCorrect) {
-        clueText.text = "You found me!";
+        var gameClues = document.getElementById('gameClues');
+        gameClues.innerHTML = "That's right!";
+        turnsText.innerHTML = "";
     } else {
-        clueText.text = "No that's not it";
+        if (turnsUntilLost > 0) {
+            turnsText.innerHTML = turnsUntilLost;
+        } else {
+            turnsText.innerHTML = "You're lost forever!";
+        }
     }
 }
 function getNaturalLanguage(colDist, rowDist, name) {
