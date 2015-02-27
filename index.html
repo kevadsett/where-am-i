@@ -5,11 +5,16 @@
 		<title> Game </title>
 		<script type="text/javascript" src="js/phaser.min.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
+		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
-		<h3 id="gameTitle">Where am I?</h3>
-		<div class="turns">Guesses left: <span id="turnsUntilLost"></span></div>
-		<div id="gameDiv"> </div>
-		<div id="gameClues"><ul id="clueList"> </ul></div>
+		<div id="gameTitle">Where am I?</div>
+		<div class="content">
+			<div class="gamePanel" id="gameDiv"></div>
+			<div class="gamePanel">
+				<div class="turns">Guesses left: <span id="turnsUntilLost"></span></div>
+				<div id="gameClues"><ul id="clueList"> </ul></div>
+			</div>
+		</div>
 	</body>
 </html>

@@ -1,0 +1,45 @@
+@font-face {
+    font-family: 'pacificoregular';
+    src: url('font/Pacifico-webfont.eot');
+    src: url('font/Pacifico-webfont.eot?#iefix') format('embedded-opentype'),
+         url('font/Pacifico-webfont.woff2') format('woff2'),
+         url('font/Pacifico-webfont.woff') format('woff'),
+         url('font/Pacifico-webfont.ttf') format('truetype'),
+         url('font/Pacifico-webfont.svg#pacificoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+	font-family: 'Arial';
+	background-color: #fff3d7;
+}
+
+#gameTitle {
+	text-align: center;
+	font-family: 'pacificoregular';
+	font-size: 38px;
+	text-shadow: 0px 1px 1px rgba(150, 150, 150, 1);
+}
+.gamePanel {
+	float: left;
+	padding: 10px;
+	margin: 10px;
+	-webkit-box-shadow: 0px 4px 6px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 4px 6px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 4px 6px 0px rgba(50, 50, 50, 0.75);
+	background-color: #fff;
+}
+#gameDiv {
+	display: inline-block;
+	background-color: #D2BA72;
+	padding: 0;
+}
+
+.content {
+	position:absolute;
+	left: 0;
+	right: 0;
+	margin: auto;
+	width: 1046px;
+}
