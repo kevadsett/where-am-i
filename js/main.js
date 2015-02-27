@@ -16,6 +16,7 @@ var main = {
         game.load.spritesheet('button', 'button.png', 150, 50);
     },
     create: function() {
+        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         clueList = document.getElementById('clueList');
         turnsText = document.getElementById('turnsUntilLost');
         game.stage.backgroundColor = 0xffffff;
@@ -172,7 +173,6 @@ function getNaturalLanguage(colDist, rowDist, name) {
     } else if (colDist > 1) {
         direction = direction ? direction + "-east" : "East";
     }
-    console.log(name, colDist, rowDist);
     var distance = Math.max(Math.abs(colDist), Math.abs(rowDist));
     switch (distance) {
         case 0:
