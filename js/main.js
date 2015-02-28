@@ -183,7 +183,7 @@ function getNaturalLanguage(colDist, rowDist, name) {
     }
     if (description) {
         description = description.replace("%s", name);
-        description += " (distance:" + distance + ")";
+        // description += " (distance:" + distance + ")";
     }
     return {description: description, distance: distance};
 }
