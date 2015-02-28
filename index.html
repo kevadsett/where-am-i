@@ -20,32 +20,86 @@
 				<div class="panel panel-default" id="gameDiv"></div>
 			</div>
 			<div class="col-sm-5">
-				<div class="panel panel-default" id="cluePanel">
-					<div class="panel-heading">
-						<h3 class="panel-title">Clues</h3>
+				<div class="row margin15">
+					<div class="panel panel-danger hidden" id="gameLostPanel">
+						<div class="panel-heading">
+							<h3 class="panel-title">Play Again</h3>
+						</div>
+						<div class="panel-body">
+							<div>You're lost forever!</div>
+							<div class="btn btn-danger" id="restartButton" onclick="events.emit('restart')">Play again</div>
+						</div>
 					</div>
-					<div class="panel-body">
-						<div class="btn btn-info" id="newClueButton" onclick="events.emit('newClue')">New clue</div>
-						<div class="turns">Guesses left: <span id="turnsUntilLost"></span></div>
-						<div id="gameClues"><ul id="clueList"> </ul></div>
+					<div class="panel panel-success hidden" id="gameWonPanel">
+						<div class="panel-heading">
+							<h3 class="panel-title">Play Again</h3>
+						</div>
+						<div class="panel-body">
+							<div>That's right!</div>
+							<div class="btn btn-success" id="restartButton" onclick="events.emit('restart')">Play again</div>
+						</div>
+					</div>
+					<div class="panel panel-default" id="cluePanel">
+						<div class="panel-heading clearfix">
+							<h3 class="panel-title pull-left">Clues</h3>
+							<div class="btn btn-success pull-right margin15" data-toggle="modal" data-target="#legendPanel">Key</div>
+							<div class="btn btn-info pull-right" id="newClueButton" onclick="events.emit('newClue')">New clue</div>
+						</div>
+						<div class="panel-body">
+							<div class="turns">Time before you're lost forever: <span id="turnsUntilLost"></span></div>
+							<div id="gameClues"><ul id="clueList"> </ul></div>
+						</div>
 					</div>
 				</div>
-				<div class="panel panel-danger hidden" id="gameLostPanel">
-					<div class="panel-heading">
-						<h3 class="panel-title">Play Again</h3>
-					</div>
-					<div class="panel-body">
-						<div>You're lost forever!</div>
-						<div class="btn btn-danger" id="restartButton" onclick="events.emit('restart')">Play again</div>
-					</div>
-				</div>
-				<div class="panel panel-success hidden" id="gameWonPanel">
-					<div class="panel-heading">
-						<h3 class="panel-title">Play Again</h3>
-					</div>
-					<div class="panel-body">
-						<div>That's right!</div>
-						<div class="btn btn-success" id="restartButton" onclick="events.emit('restart')">Play again</div>
+				<div class="modal fade" id="legendPanel">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h3 class="modal-title">Key</h3>
+							</div>
+							<div class="modal-body">
+								<h4>Legend</h4>
+								<div class="row margin15">
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/beacon.png"/></div>
+										<div class="margin15 keyText pull-left">Beacon</div>
+									</div>
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/bridge.png"/></div>
+										<div class="margin15 keyText pull-left">Bridge</div>
+									</div>
+								</div>
+								<div class="row margin15">
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/cave.png"/></div>
+										<div class="margin15 keyText pull-left">Cave</div>
+									</div>
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/fields.png"/></div>
+										<div class="margin15 keyText pull-left">Fields</div>
+									</div>
+								</div>
+								<div class="row margin15">
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/forest.png"/></div>
+										<div class="margin15 keyText pull-left">Forest</div>
+									</div>
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/mountains.png"/></div>
+										<div class="margin15 keyText pull-left">Mountains</div>
+									</div>
+								</div>
+								<div class="row margin15">
+									<div class="col-lg-6 clearfix">
+										<div class="margin15 keyImage pull-left"><img src="legend/swamp.png"/></div>
+										<div class="margin15 keyText pull-left">Swamp</div>
+									</div>
+								</div>
+								<hr/>
+								<div>One square is 50 metres</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
