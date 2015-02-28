@@ -42,7 +42,7 @@
 					<div class="panel panel-default" id="cluePanel">
 						<div class="panel-heading clearfix">
 							<h3 class="panel-title pull-left">Clues</h3>
-							<div class="btn btn-success pull-right margin15" data-toggle="modal" data-target="#legendPanel">Key</div>
+							<div class="btn btn-success pull-right margin15" data-toggle="modal" data-target="#instructionModal">Instructions</div>
 							<div class="btn btn-info pull-right" id="newClueButton" onclick="events.emit('newClue')">New clue</div>
 						</div>
 						<div class="panel-body">
@@ -51,14 +51,16 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal fade" id="legendPanel">
+				<div class="modal fade" id="instructionModal">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
-								<h3 class="modal-title">Key</h3>
+								<h3 class="modal-title">Instructions</h3>
 							</div>
 							<div class="modal-body">
+								You're lost in a strange place. Using the clues around you, can you pinpoint your location on the map?
+								<hr/>
 								<h4>Legend</h4>
 								<div class="row margin15">
 									<div class="col-lg-6 clearfix">
