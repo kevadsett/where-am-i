@@ -164,16 +164,16 @@ function getNaturalLanguage(colDist, rowDist, name) {
     var distance = Math.max(Math.abs(colDist), Math.abs(rowDist));
     switch (distance) {
         case 0:
-            description = "I'm at a %s";
+            description = "You're at a %s";
             break;
         case 1:
-            description = "I'm next to a %s";
+            description = "You're next to a %s";
             break;
         case 2:
-            description = "I'm pretty near to a %s";
+            description = "You're pretty near to a %s";
             break;
         case 3:
-            description = "I can see a %s close to the " + direction;
+            description = "You can see a %s close to the " + direction;
             break;
         case 4:
             description = "There's a %s to the " + direction;
