@@ -70,6 +70,7 @@ var main = {
             }
             var thing = things.splice(Math.floor(Math.random() * things.length), 1)[0];
             cell.frame = thing.frame;
+            cell.thing = thing;
             thingCells[thing.name] = cell;
         }
         while(cells[correctCellCoords.row][correctCellCoords.column].thing) {
