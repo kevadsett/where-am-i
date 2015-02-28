@@ -133,7 +133,7 @@ function describeCell(cell) {
     return cellDescriptions;
 }
 function onCellClicked(cell) {
-    if (turnsUntilLost <= 0) return;
+    if (turnsUntilLost <= 0 || cell.answered) return;
     game.add.sprite(cell.x, cell.y, 'answer', cell.isCorrect ? 0 : 1);
     turnsUntilLost--;
     if (cell.isCorrect) {
@@ -141,6 +141,7 @@ function onCellClicked(cell) {
         $('#gameWonPanel').removeClass('hidden');
     } else {
         if (turnsUntilLost > 0) {
+            cell.answered = true;
             turnsText.innerHTML = turnsUntilLost;
         } else {
             $('#cluePanel').addClass('hidden');
