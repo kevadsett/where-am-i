@@ -8,7 +8,7 @@ var clueText;
 var clueDiv;
 var turnsUntilLost;
 var descriptionsUsed = {};
-
+var gameOver = false;
 var main = {
     preload: function() {
         game.load.spritesheet('things', 'thingSprite.png', cellSize, cellSize);
@@ -19,6 +19,7 @@ var main = {
         turnsUntilLost = 10;
         thingCells = [];
         descriptionsUsed = {};
+        gameOver = false;
         $('#turnsUntilLost').html(turnsUntilLost);
         $('#clueList').html("");
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -168,7 +169,7 @@ function describeCell(cell) {
     return cellDescriptions;
 }
 function onCellClicked(cell) {
-    if (turnsUntilLost <= 0 || cell.answered) return;
+    if (turnsUntilLost <= 0 || cell.answered || gameOver) return;
     game.add.sprite(cell.x, cell.y, 'answer', cell.isCorrect ? 0 : 1);
     turnsUntilLost--;
     checkGameOver(cell.isCorrect);
@@ -179,10 +180,12 @@ function checkGameOver(answeredCorrectly) {
         // $('#cluePanel').addClass('hidden');
         $('#gameWonPanel').removeClass('hidden');
         $('#newClueButton').addClass('hidden');
+        gameOver = true;
     } else {
         if (turnsUntilLost > 0) {
             turnsText.innerHTML = turnsUntilLost;
         } else {
+            gameOver = true;
             game.add.sprite(correctCell.x, correctCell.y, 'answer', 0);
             // $('#cluePanel').addClass('hidden');
             $('#gameLostPanel').removeClass('hidden');
