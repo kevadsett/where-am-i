@@ -4,16 +4,14 @@ var cells;
 var cellSize = 64;
 var thingCells = {};
 var correctCell;
-var button;
 var clueText;
 var clueDiv;
 var turnsUntilLost;
+
 var main = {
     preload: function() {
-        game.load.spritesheet('cell', 'cellSprite.png', cellSize, cellSize);
         game.load.spritesheet('things', 'thingSprite.png', cellSize, cellSize);
         game.load.spritesheet('answer', 'rightWrongSprite.png', cellSize, cellSize);
-        game.load.spritesheet('button', 'button.png', 150, 50);
     },
     create: function() {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -44,13 +42,7 @@ var main = {
             }, {
                 name: "cave",
                 frame: 6
-            }/*, {
-                name: "ship",
-                colour: 0xB58E6D
-            }, {
-                name: "beach",
-                colour: 0xF0D175
-            }*/];
+            }];
         cells = new Array(rows);
         for (i = 0; i < cells.length; i++) {
             cells[i] = new Array(columns);
@@ -78,14 +70,7 @@ var main = {
             }
             var thing = things.splice(Math.floor(Math.random() * things.length), 1)[0];
             cell.frame = thing.frame;
-           /* var thing = things.splice(Math.floor(Math.random() * things.length), 1)[0];
-            graphics.beginFill(thing.colour);
-            x = cellSize * coords.column;
-            y = cellSize * coords.row;
-            graphics.drawRect(x, y, cellSize,cellSize);
-            cell.thing = thing;*/
             thingCells[thing.name] = cell;
-            // cellText = game.add.text(cell.x, cell.y, thing.name, {font: "12px Arial", fill:"#000000"});
         }
         while(cells[correctCellCoords.row][correctCellCoords.column].thing) {
             correctCellCoords = getRandomCell();
@@ -96,10 +81,10 @@ var main = {
         correctCell.descriptionIndex = correctCell.descriptions.length - 1;
         var text = correctCell.descriptions[correctCell.descriptionIndex].description;
         var style = { font: "12px Arial", fill: "#dddddd", align: "center" };
-        // clueText = game.add.text(0, game.world.height - 50, text, style);
         clueList.innerHTML = "<li>" + text + "</li>";
 
-        button = game.add.button((game.world.width - 150) / 2, game.world.height - 50, 'button', onButtonPressed, this, 0, 0, 1, 0);
+        events.on('newClue', getNewClue);
+        events.on('restart', restart);
 
         turnsText.innerHTML = turnsUntilLost;
     },
@@ -108,7 +93,7 @@ var main = {
     }
 };
 
-function onButtonPressed() {
+function getNewClue() {
     var currentDescriptionIndex = correctCell.descriptionIndex - 1;
     if (currentDescriptionIndex < 0) {
         currentDescriptionIndex = correctCell.descriptions.length - 1;
@@ -117,7 +102,8 @@ function onButtonPressed() {
     clueList.innerHTML += "<li>" + correctCell.descriptions[currentDescriptionIndex].description + "</li>";
     turnsText.innerHTML = --turnsUntilLost;
     if (turnsUntilLost <= 2) {
-        button.visible = false;
+        var button = document.getElementById('newClueButton');
+        button.className = "hidden";
     }
 }
 
@@ -150,14 +136,14 @@ function onCellClicked(cell) {
     game.add.sprite(cell.x, cell.y, 'answer', cell.isCorrect ? 0 : 1);
     turnsUntilLost--;
     if (cell.isCorrect) {
-        var gameClues = document.getElementById('gameClues');
-        gameClues.innerHTML = "That's right!";
-        turnsText.innerHTML = "";
+        $('#cluePanel').addClass('hidden');
+        $('#gameWonPanel').removeClass('hidden');
     } else {
         if (turnsUntilLost > 0) {
             turnsText.innerHTML = turnsUntilLost;
         } else {
-            turnsText.innerHTML = "You're lost forever!";
+            $('#cluePanel').addClass('hidden');
+            $('#gameLostPanel').removeClass('hidden');
         }
     }
 }
@@ -202,6 +188,13 @@ function getNaturalLanguage(colDist, rowDist, name) {
     return {description: description, distance: distance};
 }
 
-var game = new Phaser.Game(cellSize * columns, cellSize * rows + 50, Phaser.AUTO, 'gameDiv');
+function restart() {
+    game.state.start('main');
+    $('#cluePanel').removeClass('hidden');
+    $('#gameWonPanel').addClass('hidden');
+    $('#gameLostPanel').addClass('hidden');
+}
+
+var game = new Phaser.Game(cellSize * columns, cellSize * rows, Phaser.AUTO, 'gameDiv');
 game.state.add('main', main);
 game.state.start('main');
