@@ -15,6 +15,12 @@ var main = {
         game.load.spritesheet('answer', 'rightWrongSprite.png', cellSize, cellSize);
     },
     create: function() {
+        events.off();
+        turnsUntilLost = 10;
+        thingCells = [];
+        descriptionsUsed = {};
+        $('#turnsUntilLost').html(turnsUntilLost);
+        $('#clueList').html("");
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         clueList = document.getElementById('clueList');
         turnsText = document.getElementById('turnsUntilLost');
@@ -86,6 +92,7 @@ var main = {
         }
         correctCell = cells[correctCellCoords.row][correctCellCoords.column];
         correctCell.isCorrect = true;
+        // game.add.sprite(correctCell.x, correctCell.y, 'answer', 0);
         correctCell.descriptions = describeCell(correctCell);
         correctCell.descriptionIndex = correctCell.descriptions.length - 1;
         var text = correctCell.descriptions[correctCell.descriptionIndex].description;
@@ -110,10 +117,7 @@ function getNewClue() {
     correctCell.descriptionIndex = currentDescriptionIndex;
     clueList.innerHTML += "<li>" + correctCell.descriptions[currentDescriptionIndex].description + "</li>";
     turnsText.innerHTML = --turnsUntilLost;
-    if (turnsUntilLost <= 2) {
-        var button = document.getElementById('newClueButton');
-        button.className = "hidden";
-    }
+    checkGameOver(false);
 }
 
 function getRandomColour() {
@@ -123,7 +127,6 @@ function getRandomCell() {
     return {row: Math.floor(Math.random() * rows), column: Math.floor(Math.random() * columns)};
 }
 function describeCell(cell) {
-    // cell.frame = cell.isCorrect ? 2 : 1;
     var cellDescriptions = [];
     thingCells.sort(function(a, b) {
         var colDistA = a.column - cell.column;
@@ -168,16 +171,22 @@ function onCellClicked(cell) {
     if (turnsUntilLost <= 0 || cell.answered) return;
     game.add.sprite(cell.x, cell.y, 'answer', cell.isCorrect ? 0 : 1);
     turnsUntilLost--;
-    if (cell.isCorrect) {
-        $('#cluePanel').addClass('hidden');
+    checkGameOver(cell.isCorrect);
+    cell.answered = true;
+}
+function checkGameOver(answeredCorrectly) {
+    if (answeredCorrectly) {
+        // $('#cluePanel').addClass('hidden');
         $('#gameWonPanel').removeClass('hidden');
+        $('#newClueButton').addClass('hidden');
     } else {
         if (turnsUntilLost > 0) {
-            cell.answered = true;
             turnsText.innerHTML = turnsUntilLost;
         } else {
-            $('#cluePanel').addClass('hidden');
+            game.add.sprite(correctCell.x, correctCell.y, 'answer', 0);
+            // $('#cluePanel').addClass('hidden');
             $('#gameLostPanel').removeClass('hidden');
+            $('#newClueButton').addClass('hidden');
         }
     }
 }
@@ -229,7 +238,7 @@ function getNaturalLanguage(colDist, rowDist, thing, isDuplicate) {
 
 function restart() {
     game.state.start('main');
-    $('#cluePanel').removeClass('hidden');
+    $('#newClueButton').removeClass('hidden');
     $('#gameWonPanel').addClass('hidden');
     $('#gameLostPanel').addClass('hidden');
 }
