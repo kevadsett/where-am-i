@@ -2,7 +2,6 @@
     font-family: 'GoodDogregular';
     src: url('../fonts/GoodDog-webfont.eot');
     src: url('../fonts/GoodDog-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/GoodDog-webfont.woff2') format('woff2'),
          url('../fonts/GoodDog-webfont.woff') format('woff'),
          url('../fonts/GoodDog-webfont.ttf') format('truetype'),
          url('../fonts/GoodDog-webfont.svg#GoodDogregular') format('svg');
