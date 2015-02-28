@@ -2,11 +2,12 @@ var rows = 8;
 var columns = 10;
 var cells;
 var cellSize = 64;
-var thingCells = {};
+var thingCells = [];
 var correctCell;
 var clueText;
 var clueDiv;
 var turnsUntilLost;
+var descriptionsUsed = {};
 
 var main = {
     preload: function() {
@@ -22,8 +23,9 @@ var main = {
             i, row, col, x, y, cell,
             correctCellCoords = getRandomCell(),
             things = [{
-                name: "mountain",
-                frame: 0
+                name: "mountains",
+                frame: 0,
+                isPlural: true
             }, {
                 name: "forest",
                 frame: 1
@@ -31,8 +33,9 @@ var main = {
                 name: "swamp",
                 frame: 2
             }, {
-                name: "field",
-                frame: 3
+                name: "fields",
+                frame: 3,
+                isPlural: true
             }, {
                 name: "beacon",
                 frame: 4
@@ -58,10 +61,15 @@ var main = {
                 cell.row = row;
                 cell.column = col;
                 cells[row][col] = cell;
+                if (Math.random() > 0.8) {
+                    cell.thing = things[Math.floor(Math.random() * things.length)];
+                    cell.frame = cell.thing.frame;
+                    thingCells.push(cell);
+                }
             }
         }
 
-        while (things.length > 0) {
+       /* while (things.length > 0) {
             var coords = getRandomCell();
             cell = cells[coords.row][coords.column];
             while (cell.thing) {
@@ -72,7 +80,7 @@ var main = {
             cell.frame = thing.frame;
             cell.thing = thing;
             thingCells[thing.name] = cell;
-        }
+        }*/
         while(cells[correctCellCoords.row][correctCellCoords.column].thing) {
             correctCellCoords = getRandomCell();
         }
@@ -117,19 +125,43 @@ function getRandomCell() {
 function describeCell(cell) {
     // cell.frame = cell.isCorrect ? 2 : 1;
     var cellDescriptions = [];
-    for (var key in thingCells) {
-        var thingCell = thingCells[key];
+    thingCells.sort(function(a, b) {
+        var colDistA = a.column - cell.column;
+        var rowDistA = a.row - cell.row;
+        var distA = Math.max(Math.abs(colDistA), Math.abs(rowDistA));
+        var colDistB = b.column - cell.column;
+        var rowDistB = b.row - cell.row;
+        var distB = Math.max(Math.abs(colDistB), Math.abs(rowDistB));
+        return distA - distB;
+    });
+
+    for (var i = 0; i < thingCells.length; i++) {
+        var thingCell = thingCells[i];
         var colDist = thingCell.column - cell.column;
         var rowDist = thingCell.row - cell.row;
-        var description = getNaturalLanguage(colDist, rowDist, key);
+        var isDuplicate = false;
+        var distance = Math.max(Math.abs(colDist), Math.abs(rowDist));
+        var thingDescription = descriptionsUsed[thingCell.thing.name];
+        if (!thingDescription) {
+            descriptionsUsed[thingCell.thing.name] = new Array(10);
+        } else {
+            for (var j = distance; j > 0; j--) {
+                if (thingDescription[j]) {
+                    isDuplicate = true;
+                }
+            }
+        }
+        var description = getNaturalLanguage(colDist, rowDist, thingCell.thing, isDuplicate);
         if (description.description) {
-            cellDescriptions.push(description);
+            if (!descriptionsUsed[thingCell.thing.name][description.distance]) {
+                descriptionsUsed[thingCell.thing.name][description.distance] = true;
+                cellDescriptions.push(description);
+            }
         }
     }
     cellDescriptions.sort(function(a, b) {
-        return a.distance - b.distance;
+        return b.distance - a.distance;
     });
-    turnsUntilLost = cellDescriptions.length + 1;
     return cellDescriptions;
 }
 function onCellClicked(cell) {
@@ -149,42 +181,47 @@ function onCellClicked(cell) {
         }
     }
 }
-function getNaturalLanguage(colDist, rowDist, name) {
-    var direction, description, language;
-    if (rowDist < -1) {
+function getNaturalLanguage(colDist, rowDist, thing, isDuplicate) {
+    var direction, oppositeDirection, description, language;
+    if (rowDist < 0) {
         direction = "North";
-    } else if (rowDist > 1) {
+        oppositeDirection = "South";
+    } else if (rowDist > 0) {
         direction = "South";
+        oppositeDirection = "North";
     }
-    if (colDist < -1) {
+    if (colDist < 0) {
         direction = direction ? direction + "-west" : "West";
-    } else if (colDist > 1) {
+        oppositeDirection = oppositeDirection ? oppositeDirection + "-east" : "East";
+    } else if (colDist > 0) {
         direction = direction ? direction + "-east" : "East";
+        oppositeDirection = oppositeDirection ? oppositeDirection + "-west" : "West";
     }
     var distance = Math.max(Math.abs(colDist), Math.abs(rowDist));
-    switch (distance) {
-        case 0:
-            description = "You're at a %s";
-            break;
-        case 1:
-            description = "You're next to a %s";
-            break;
-        case 2:
-            description = "You're pretty near to a %s";
-            break;
-        case 3:
-            description = "You can see a %s close to the " + direction;
-            break;
-        case 4:
-            description = "There's a %s to the " + direction;
-            break;
-        case 5:
-        case 6:
-            description = "There's a %s in the distance to the " + direction;
-            break;
+    var distanceText = (distance * 50) + " metres";
+    var areIs = thing.isPlural ? "are" : "is";
+    var aSome = (thing.isPlural ? "some" : "a") + (isDuplicate ? (thing.isPlural ? " other" : "nother") : "");
+    console.log(distance + " from " + aSome + " " + thing.name);
+    var descriptions = [
+        ["You're less than 100 metres from aSome %s", "You're really close to aSome %s", "You're next to aSome %s"],
+        ["You're about %d %o of aSome %s", "You're only about %d %p of aSome %s,", "There areIs aSome %s %d to the %p"],
+        ["You can see %s about %d to the %p", "There areIs aSome %s %d to the %p"],
+        ["There areIs aSome %s %d to the %p"],
+        ["There areIs aSome %s in the distance, about %d to the %p"],
+        ["There areIs aSome %s %d to the %p"]
+
+    ];
+    if (distance < descriptions.length) {
+        var descriptionChoices = descriptions[distance - 1];
+        description = descriptionChoices[Math.floor(Math.random() * descriptionChoices.length)];
     }
     if (description) {
-        description = description.replace("%s", name);
+        description = description.replace("areIs", areIs);
+        description = description.replace("aSome", aSome);
+        description = description.replace("%s", thing.name);
+        description = description.replace("%d", distanceText);
+        description = description.replace("%p", direction);
+        description = description.replace("%o", oppositeDirection);
         // description += " (distance:" + distance + ")";
     }
     return {description: description, distance: distance};
