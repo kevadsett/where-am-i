@@ -249,4 +249,4 @@ function restart() {
 var game = new Phaser.Game(cellSize * columns, cellSize * rows, Phaser.AUTO, 'gameDiv');
 game.state.add('main', main);
 game.state.start('main');
-$('#instructionModal').modal('show')
+$('#instructionModal').modal('show');
